@@ -1,0 +1,12 @@
+[package]
+name = "renderex"
+version = "0.1.0"
+edition = "2021"
+description = "Renderex — декларативный мини-язык для рендеринга окон: фигуры, цвета и изображения из интернета"
+license = "MIT"
+
+[dependencies]
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp"] }
+softbuffer = "0.4"
+ureq = "2"
+winit = "0.30"
