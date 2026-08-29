@@ -1,0 +1,13 @@
+// Клетчатая сцена без циклов: просто много команд в одну строку.
+window 640 400 "grid"
+background #202020
+rect 0 0 640 400 #303030
+square 0 0 64 silver; square 128 0 64 silver; square 256 0 64 silver
+square 384 0 64 silver; square 512 0 64 silver
+circle 64 64 30 #ff5252
+circle 192 64 30 #ffab40
+circle 320 64 30 #69f0ae
+circle 448 64 30 #40c4ff
+circle 576 64 30 #e040fb
+line 0 200 640 200 white 2
+line 320 0 320 400 white 2
