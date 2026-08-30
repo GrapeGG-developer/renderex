@@ -6,10 +6,21 @@ on:
   pull_request:
 
 jobs:
-  test:
+  test-linux:
     name: cargo test (Linux)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --workspace
+
+  test-windows:
+    name: cargo test (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --workspace
+      # Проверяем и release-сборку: именно её копирует установщик,
+      # и она должна собраться как GUI-приложение (без консоли).
+      - run: cargo build --release
