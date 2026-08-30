@@ -212,12 +212,13 @@ impl Parser {
                     objects.push(Object::Line { x1, y1, x2, y2, width, color });
                 }
                 "image" | "img" => {
+                    let line = t.line;
                     let x = self.expect_number("x")?;
                     let y = self.expect_number("y")?;
                     let w = self.expect_size("ширина", &t)?;
                     let h = self.expect_dim_sized(&t)?;
                     let src = self.expect_string()?;
-                    objects.push(Object::Image { x, y, w, h, src });
+                    objects.push(Object::Image { x, y, w, h, src, line });
                 }
                 other => {
                     return Err(self.err_at(&t, format!("неизвестная команда '{other}'")));

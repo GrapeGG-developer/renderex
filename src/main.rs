@@ -55,9 +55,12 @@ renderex — декларативный язык рендеринга окон
     renderex <файл.rx> [ПАРАМЕТРЫ]
 
 ПАРАМЕТРЫ:
-    -o, --output <путь>   Вместо окна отрисовать сцену в PNG
-    -h, --help            Показать эту справку
-    -V, --version         Показать версию
+    -o, --output <путь>     Вместо окна отрисовать сцену в PNG
+    -p, --proxy <url|none>  Прокси для загрузки картинок (по умолчанию
+                            автоопределение: переменные окружения, затем
+                            системный прокси Windows). none — без прокси
+    -h, --help              Показать эту справку
+    -V, --version           Показать версию
 
 В окне: Esc или закрытие окна — выход.
 
@@ -81,6 +84,12 @@ fn main() -> ExitCode {
                     return fail(&format!("параметр '{a}' требует путь к файлу"));
                 };
                 output = Some(PathBuf::from(path));
+            }
+            "-p" | "--proxy" => {
+                let Some(proxy) = args.next() else {
+                    return fail(&format!("параметр '{a}' требует адрес прокси или 'none'"));
+                };
+                renderex::fetch::set_proxy_override(Some(proxy));
             }
             s if s.starts_with('-') => {
                 return fail(&format!("неизвестный параметр '{s}'"));
@@ -112,7 +121,8 @@ fn main() -> ExitCode {
 
     let result = match output {
         Some(out) => headless::render_to_png(&scene, &out, &base_dir),
-        None => window::show_window(&scene, &base_dir).map_err(|e| Diag::new(e, 1, 1, 1)),
+        None => window::show_window(&scene, &base_dir)
+            .map_err(|(line, msg)| Diag::new(msg, line.max(1), 1, 1)),
     };
 
     match result {

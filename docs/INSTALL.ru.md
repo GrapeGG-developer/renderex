@@ -36,6 +36,22 @@ powershell -ExecutionPolicy Bypass -File install\install.ps1 -Rebuild
 пишет в `HKLM` (для всех пользователей, требуется запуск PowerShell
 от имени администратора).
 
+## Загрузка картинок через прокси
+
+Если в вашей сети доступ к интернету идёт через прокси (корпоративная
+сеть, VPN-клиенты и т.п.), renderex определит его автоматически:
+сначала переменные окружения `HTTPS_PROXY`/`HTTP_PROXY`/`RENDREX_PROXY`,
+затем **системные настройки Windows** (IE/WinINET, включая PAC-скрипты).
+Явно задать прокси или отключить его можно так:
+
+```console
+rem через прокси
+renderex scene.rx --proxy http://proxy.corp.local:3128
+
+rem полностью без прокси (игнорировать системный)
+renderex scene.rx --proxy none
+```
+
 ## Поведение release-сборки на Windows
 
 Release-версия собрана как GUI-приложение (`windows_subsystem =

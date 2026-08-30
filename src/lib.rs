@@ -23,6 +23,7 @@ pub mod ast;
 pub mod color;
 pub mod diag;
 pub mod engine;
+pub mod fetch;
 pub mod lexer;
 pub mod parser;
 

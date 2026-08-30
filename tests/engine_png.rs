@@ -75,3 +75,14 @@ fn image_from_internet_renders() {
     }
     assert!(non_white > 100, "изображение не отрисовалось ({} пикселей)", non_white);
 }
+
+#[test]
+fn html_url_reports_exact_line() {
+    let scene = renderex::compile(
+        "window 100 100\nbackground black\nsquare 0 0 10 red\nimage 0 0 10 10 \"https://example.com\"",
+    )
+    .unwrap();
+    let err = render_to_png(&scene, &Path::new(TMP).join("err.png"), Path::new(TMP)).unwrap_err();
+    assert_eq!(err.line, 4, "ошибка должна указывать на строку 4 (команда image)");
+    assert!(err.message.contains("HTML"), "получено: {}", err.message);
+}

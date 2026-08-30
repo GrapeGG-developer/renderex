@@ -16,11 +16,13 @@ use winit::window::{Window, WindowId};
 type WindowRef = Arc<Window>;
 
 /// Показать сцену в нативном окне. Работает и на Windows, и на macOS/Linux.
-pub fn show_window(scene: &Scene, base_dir: &Path) -> Result<(), String> {
+/// При ошибке возвращает `(строка_в_исходнике, сообщение)`.
+pub fn show_window(scene: &Scene, base_dir: &Path) -> Result<(), (usize, String)> {
     let images = load_images(scene, base_dir)?;
     let framebuffer = render_scene(scene, &images);
 
-    let event_loop = EventLoop::new().map_err(|e| format!("не удалось создать event loop: {e}"))?;
+    let event_loop =
+        EventLoop::new().map_err(|e| (0, format!("не удалось создать event loop: {e}")))?;
     let mut app = App {
         scene_pixels: framebuffer.pixels,
         width: scene.window.width,
@@ -32,7 +34,7 @@ pub fn show_window(scene: &Scene, base_dir: &Path) -> Result<(), String> {
 
     event_loop
         .run_app(&mut app)
-        .map_err(|e| format!("ошибка цикла окна: {e}"))
+        .map_err(|e| (0, format!("ошибка цикла окна: {e}")))
 }
 
 struct App {

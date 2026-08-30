@@ -9,7 +9,7 @@ use std::path::Path;
 /// Отрисовать сцену и сохранить результат в PNG.
 pub fn render_to_png(scene: &Scene, out_path: &Path, base_dir: &Path) -> Result<()> {
     let images = load_images(scene, base_dir)
-        .map_err(|e| Diag::new(e, 1, 1, 1))?;
+        .map_err(|(line, msg)| Diag::new(msg, line.max(1), 1, 1))?;
     let fb = render_scene(scene, &images);
 
     let mut bytes = Vec::with_capacity(fb.pixels.len() * 4);

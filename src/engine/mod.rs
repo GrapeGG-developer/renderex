@@ -17,35 +17,28 @@ pub type ImageMap = HashMap<usize, RgbaImage>;
 
 /// Скачивает/читает все изображения сцены.
 /// Локальные пути (без `://`) считаются относительными к `base_dir`.
-pub fn load_images(scene: &Scene, base_dir: &Path) -> Result<ImageMap, String> {
+/// При ошибке возвращает `(строка_в_исходнике, сообщение)`.
+pub fn load_images(scene: &Scene, base_dir: &Path) -> Result<ImageMap, (usize, String)> {
     let mut map = HashMap::new();
     for (i, obj) in scene.objects.iter().enumerate() {
-        if let Object::Image { src, .. } = obj {
-            map.insert(i, load_image(src, base_dir)?);
+        if let Object::Image { src, line, .. } = obj {
+            map.insert(
+                i,
+                load_image(src, base_dir).map_err(|e| (*line, e))?,
+            );
         }
     }
     Ok(map)
 }
 
 /// Загружает одно изображение: по http/https ссылке или из локального файла.
+/// Для URL действуют: кэш, лимит размера, автопрокси, понятные ошибки.
 pub fn load_image(src: &str, base_dir: &Path) -> Result<RgbaImage, String> {
     let bytes: Vec<u8> = if src.contains("://") {
         if !(src.starts_with("http://") || src.starts_with("https://")) {
             return Err(format!("поддерживаются только ссылки http/https, получено: {src}"));
         }
-        use std::io::Read;
-        let agent = ureq::AgentBuilder::new()
-            .timeout(std::time::Duration::from_secs(30))
-            .build();
-        let resp = agent
-            .get(src)
-            .call()
-            .map_err(|e| format!("не удалось скачать изображение '{src}': {e}"))?;
-        let mut buf = Vec::new();
-        resp.into_reader()
-            .read_to_end(&mut buf)
-            .map_err(|e| format!("ошибка чтения '{src}': {e}"))?;
-        buf
+        crate::fetch::fetch_http(src)?
     } else {
         let path = if Path::new(src).is_absolute() {
             Path::new(src).to_path_buf()
